@@ -29,6 +29,7 @@
         align-items: center;
         justify-content: center;
         overflow: hidden;
+        transition: background 1s;
       }
 
       pre {
@@ -58,7 +59,7 @@
       .github {
         width: 200px;
         height: 200px;
-        background: #15141a;
+        background: transparent; /* 初始透明 */
         border-radius: 50%;
         margin: auto;
         display: block;
@@ -67,53 +68,57 @@
         transition: transform 0.3s;
       }
 
-      .github:hover {
-        transform: scale(1.1);
+      .github.visible {
+        background: #15141a; /* 图案绘制过程中变为可见 */
       }
 
       .github::before, .github::after, .github>i::before, .github>i::after, .github>i>i::before, .github>i>i::after {
         content: '';
         display: block;
         position: absolute;
-        background-color: #fff;
+        background-color: transparent; /* 初始透明 */
       }
 
-      .github::before {
+      .github-face::before {
         width: 120px;
         height: 108px;
         top: 41px;
         left: 40px;
         border-radius: 50%;
         box-shadow: 16px 0px 0 -6px #fff, -16px 0px 0 -6px #fff;
+        background-color: #fff;
       }
 
-      .github::after {
+      .github-neck::after {
         width: 46px;
         height: 62px;
         border-radius: 14px 14px 0 0;
         top: 140px;
         left: 77px;
+        background-color: #fff;
       }
 
-      .github>i::before {
+      .github-ear-left>i::before {
         width: 40px;
         height: 40px;
         border-radius: 15% 70% 15% 70%;
         top: 35px;
         left: 40px;
         transform: rotate(11deg);
+        background-color: #fff;
       }
 
-      .github>i::after {
+      .github-ear-right>i::after {
         width: 40px;
         height: 40px;
         border-radius: 15% 70% 15% 70%;
         top: 35px;
         right: 40px;
         transform: rotate(79deg);
+        background-color: #fff;
       }
 
-      .github>i>i::before {
+      .github-tail-1>i>i::before {
         width: 40px;
         height: 40px;
         border-radius: 50% 50%;
@@ -126,7 +131,7 @@
         transform: rotate(15deg);
       }
 
-      .github>i>i::after {
+      .github-tail-2>i>i::after {
         width: 28px;
         height: 28px;
         border-radius: 50% 50%;
@@ -193,7 +198,6 @@ pre {
   align-items: center;
   justify-content: center;
 }
-/* 我去，感觉不好画，要不先画个圆 */
 .github {
   width: 200px;
   height: 200px;
@@ -203,11 +207,9 @@ pre {
   display: block;
   position: relative;
 }
-/* 继续优化章鱼猫的样式 */
 .github:hover {
   transform: scale(1.1);
 }
-/* 哈哈哈，就是这么简单 */
 `;
 
       const getStyleHtml = function () {
@@ -259,7 +261,41 @@ pre {
             () => writeStyles(message, index, interval),
             interval,
           );
+        } else {
+          // 动画完成后开始循环变色和弹出祝福语
+          startColorChange();
         }
+      };
+
+      // 动态添加类名以实现逐步绘制效果
+      const steps = [
+        "visible",
+        "github-face",
+        "github-neck",
+        "github-ear-left",
+        "github-ear-right",
+        "github-tail-1",
+        "github-tail-2"
+      ];
+
+      const addClassStep = (stepIndex) => {
+        if (stepIndex < steps.length) {
+          document.querySelector(".github").classList.add(steps[stepIndex]);
+          setTimeout(() => addClassStep(stepIndex + 1), 800); // 每个步骤的延迟时间
+        } else {
+          startColorChange(); // 完成后开始变色和弹出祝福语
+        }
+      };
+
+      const startColorChange = function () {
+        alert('祝代码工作者们1024快乐！');
+        const colors = ['#15141a', 'pink', 'blue', 'purple']; // 黑色、粉色、蓝色、紫色
+        let colorIndex = 0;
+
+        setInterval(() => {
+          document.body.style.background = colors[colorIndex];
+          colorIndex = (colorIndex + 1) % colors.length;
+        }, 1000);
       };
 
       document.body.insertAdjacentHTML(
@@ -273,11 +309,8 @@ pre {
 
       writeStyles(styles, 0, 24);
 
-      // 添加点击功能
-      document.getElementById('octocat').addEventListener('click', function() {
-        document.body.style.background = document.body.style.background === 'pink' ? '#15141a' : 'pink';
-        alert('祝代码工作者们1024快乐!');
-      });
+      // 开始逐步绘制图案
+      setTimeout(() => addClassStep(0), 2000); // 延迟开始，确保逐字符显示同步
     </script>
   </body>
 </html>
